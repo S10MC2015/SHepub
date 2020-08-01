@@ -11,7 +11,7 @@ import bs4
 import ebooklib
 
 #URL of SH story.
-URL = 'https://www.scribblehub.com/read/14190-the-novels-redemption/'
+URL = input("Please put in the URL of the story. Eg. https://www.scribblehub.com/read/14190-the-novels-redemption/ \n \n")
 
 #Requests the story startpage and stores the html code into startpage variable. Then uses BeautifulSoup to get the actual contents.
 startpage = requests.get(URL)
@@ -62,9 +62,8 @@ print("First Chapter URL: " + firstchpurl + "\n \n")
 
 #exit()
 
+URL = firstchpurl
 
-#URL of chapter.
-URL = 'https://www.scribblehub.com/read/14190-the-novels-redemption/chapter/149818/'
 
 #Requests the chapter page and stores the html code into chapter variable. Then uses BeautifulSoup to get the actual contents.
 chapter = requests.get(URL)
@@ -100,6 +99,10 @@ for i in anrawp:
 #The chapter contains the authornote normally so this uses the authornote we extracted and replaces it with nothingness in the chapter text
 chpnorm = chpnorm.replace(annorm,"")
 
-
 print("Chapter Text: " + chpnorm + "\n \n \n")
 print("AuthorNote: " + annorm + "\n \n \n")
+
+#Finds element for the read button then finds the hyperlink url.
+nextchpurl = chphtml.find(class_='btn-wi btn-next')
+nextchpurl = nextchpurl.find('a')['href']
+print("Next Chapter URL: " + nextchpurl + "\n \n")
