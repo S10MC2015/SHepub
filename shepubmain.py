@@ -1,3 +1,9 @@
+#Credits:
+#https://stackoverflow.com/a/12657803 for venv advice
+#https://realpython.com/beautiful-soup-web-scraper-python/#what-is-web-scraping for teaching me how to web scrape
+#That guy on the python discord who helped me
+#Also Thanks to Ghost and Ultra for the help.
+
 #Import all the things that will be needed
 import requests
 import os
