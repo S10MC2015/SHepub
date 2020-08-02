@@ -4,6 +4,7 @@
 #That guy on the python discord who helped me
 #Another guy on python discord who helped me
 #Thanks to fanficfare for inadvertantly teaching me what decompose does and i really wish i knew you existed before i started this lol
+#https://stackoverflow.com/a/35156699 for venv.sh thing
 #Also Thanks to Ghost and Ultra for the help.
 
 #Import all the things that will be needed
@@ -99,6 +100,11 @@ else:
   tags = tags.replace(",  ",".")
   print("Tags: " + tags + "\n \n")
 
+#Finds element for the read button then finds the hyperlink url.
+firstchpurl = sphtml.find(class_='read_buttons')
+firstchpurl = firstchpurl.find('a')['href']
+print("First Chapter URL: " + firstchpurl + "\n \n")
+
 bookid = URL
 bookid = bookid.replace("https://www.scribblehub.com/series/","")
 bookid = bookid.replace("/","")
@@ -111,12 +117,16 @@ book.add_author(authorname)
 #book.set_cover(coverimage, open(coverimage, 'rb').read())
 book.add_metadata('DC', 'description', synopsis)
 
+c0 = epub.EpubHtml(title='Details',
+                   file_name='details.xhtml',
+                   lang='en')
+ch0fix = bs4.BeautifulSoup('<html><body><h1>'+ storytitle +'</h1><h2> Details about the story</hl2><p>Created by: '+ authorname +'</p><p>Last Chapter Upload: '+ latestchpupload +'</p><p></p><p>Synopsis: '+ synopsis +'</p><p></p><p>Genre: '+ genre +'</p><p>Tags: '+ tags +'</p><p></p><p>Ebook made using SHepub</p></body></html>')
 
-#Finds element for the read button then finds the hyperlink url.
-firstchpurl = sphtml.find(class_='read_buttons')
-firstchpurl = firstchpurl.find('a')['href']
-print("First Chapter URL: " + firstchpurl + "\n \n")
-
+ch0fix = ch0fix.prettify()
+c0.set_content(ch0fix)
+book.add_item(ch0)
+#print(ch0fix)
+#print(c0.get_content())
 #exit()
 
 URL = firstchpurl
