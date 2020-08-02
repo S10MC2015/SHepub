@@ -10,10 +10,14 @@ import requests
 import os
 import bs4
 import ebooklib
+from ebooklib import epub
+
+book = epub.EpubBook()
 
 #Declares authornote normal and chapter text normal variables
 annorm = ""
 chpnorm = ""
+passes = 0
 
 #URL of SH story.
 URL = input("Please put in the URL of the story. Eg. https://www.scribblehub.com/read/14190-the-novels-redemption/ \n \n")
@@ -23,9 +27,14 @@ startpage = requests.get(URL)
 sphtml = bs4.BeautifulSoup(startpage.content, 'html.parser')
 
 #Finds the element for author name then takes the text out of it.
+storytitle = sphtml.find(class_='fic_title')
+storytitle = storytitle.get_text()
+print("\nStory Title: " + storytitle + "\n \n")
+
+#Finds the element for author name then takes the text out of it.
 authorname = sphtml.find(class_='auth_name_fic')
 authorname = authorname.get_text()
-print("\nAuthor: " + authorname + "\n \n")
+print("Author: " + authorname + "\n \n")
 
 #Finds the element for coverimage then takes the image source url out of it.
 coverimage = sphtml.find(class_='fic_image')
@@ -69,6 +78,18 @@ else:
   tags = tags.replace(",  ",".")
   print("Tags: " + tags + "\n \n")
 
+bookid = URL
+bookid = bookid.replace("https://www.scribblehub.com/series/","")
+bookid = bookid.replace("/","")
+
+book.set_identifier(bookid)
+book.set_title(storytitle)
+book.set_language('eng')
+book.set_language('en')
+book.add_author(authorname)
+#book.set_cover(coverimage, open(coverimage, 'rb').read())
+book.add_metadata('DC', 'description', synopsis)
+
 #Finds element for the read button then finds the hyperlink url.
 firstchpurl = sphtml.find(class_='read_buttons')
 firstchpurl = firstchpurl.find('a')['href']
@@ -78,7 +99,10 @@ print("First Chapter URL: " + firstchpurl + "\n \n")
 
 URL = firstchpurl
 
-def chpdata(URL):
+def chpdata(URL,passes):
+
+  passes += 1
+
   #Requests the chapter page and stores the html code into chapter variable. Then uses BeautifulSoup to get the actual contents.
   chapter = requests.get(URL)
   chphtml = bs4.BeautifulSoup(chapter.content, 'html.parser')
@@ -124,6 +148,7 @@ def chpdata(URL):
   nextchpurl = chphtml.find(class_='btn-wi btn-next')
   if nextchpurl == None:
     #ebookmake
+    print("Passes: ",passes)
     exit()
   else:
     nextchpurl = nextchpurl['href']
@@ -148,7 +173,8 @@ def chpdata(URL):
 #      del anrawp
 #    if 'l' in globals():
 #      del l
-    chpdata(nextchpurl)
+    print("Passes: ",passes)
+    chpdata(nextchpurl,passes)
 
 
-chpdata(firstchpurl)
+chpdata(firstchpurl,passes)
