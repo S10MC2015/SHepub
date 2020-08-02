@@ -11,10 +11,22 @@ import os
 import bs4
 import ebooklib
 from ebooklib import epub
+import datetime
+#import logging
+
+#logging.basicConfig(format='%(asctime)s %(message)s', #filemode="w", filename = "latest.log",level=logging.INFO, #datefmt='%d-%m-%Y %H:%M:%S')
+#logging.getLogger().addHandler(logging.StreamHandler())
+
+#logging.log("Logging is enabled! \n \n")
 
 book = epub.EpubBook()
 
-#Declares authornote normal and chapter text normal variables
+def gettime():
+  time = datetime.datetime.now()
+  gettime.timestr = time.strftime("%d-%m-%Y  %H:%M:%S")
+
+
+#Declares authornote normal and chapter text normal and passes variables just in case.
 annorm = ""
 chpnorm = ""
 passes = 0
@@ -24,7 +36,10 @@ URL = input("Please put in the URL of the story. Eg. https://www.scribblehub.com
 
 #Requests the story startpage and stores the html code into startpage variable. Then uses BeautifulSoup to get the actual contents.
 startpage = requests.get(URL)
-sphtml = bs4.BeautifulSoup(startpage.content, 'html.parser')
+sphtml = bs4.BeautifulSoup(startpage.text, 'lxml')
+
+gettime()
+print("Start Time of Scraping: ",gettime.timestr)
 
 #Finds the element for author name then takes the text out of it.
 storytitle = sphtml.find(class_='fic_title')
@@ -40,6 +55,10 @@ print("Author: " + authorname + "\n \n")
 coverimage = sphtml.find(class_='fic_image')
 coverimage = coverimage.find('img')['src']
 print("CoverImage URL: " + coverimage + "\n \n")
+
+latestchpupload = sphtml.find(class_='fic_date_pub')
+latestchpupload = latestchpupload['title']
+print("Latest Chapter Upload Time: " + latestchpupload + "\n \n")
 
 #Finds element for synopsis then finds all text in the <p> tags. Then it adds then to the variable with line breaks.
 synopsisraw = sphtml.find(class_='wi_fic_desc')
@@ -64,6 +83,7 @@ else:
   genre += " "
   genre = genre.replace(",  ",".")
   print("Genre: " + genre + "\n \n")
+
 
 #Finds element for tags then finds all elements with <a> tag then takes all text out and adds comma+space. Next it adds an extra space to last one and replaces comma+space+space with a full stop.
 tagsraw = sphtml.find(class_='wi_fic_showtags_inner')
@@ -90,6 +110,7 @@ book.add_author(authorname)
 #book.set_cover(coverimage, open(coverimage, 'rb').read())
 book.add_metadata('DC', 'description', synopsis)
 
+
 #Finds element for the read button then finds the hyperlink url.
 firstchpurl = sphtml.find(class_='read_buttons')
 firstchpurl = firstchpurl.find('a')['href']
@@ -105,7 +126,7 @@ def chpdata(URL,passes):
 
   #Requests the chapter page and stores the html code into chapter variable. Then uses BeautifulSoup to get the actual contents.
   chapter = requests.get(URL)
-  chphtml = bs4.BeautifulSoup(chapter.content, 'html.parser')
+  chphtml = bs4.BeautifulSoup(chapter.text, 'lxml')
 
   #Finds the element for chapter title then takes the text out of it.
   chptitle = chphtml.find(class_='chapter-title')
@@ -149,6 +170,8 @@ def chpdata(URL,passes):
   if nextchpurl == None:
     #ebookmake
     print("Passes: ",passes)
+    gettime()
+    print("End Time of Scraping: ",gettime.timestr)
     exit()
   else:
     nextchpurl = nextchpurl['href']
