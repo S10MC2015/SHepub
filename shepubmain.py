@@ -3,6 +3,7 @@
 #https://realpython.com/beautiful-soup-web-scraper-python/#what-is-web-scraping for teaching me how to web scrape
 #That guy on the python discord who helped me
 #Another guy on python discord who helped me
+#Thanks to fanficfare for inadvertantly teaching me what decompose does and i really wish i knew you existed before i started this lol
 #Also Thanks to Ghost and Ultra for the help.
 
 #Import all the things that will be needed
@@ -128,16 +129,15 @@ def chpdata(URL,passes):
   chapter = requests.get(URL)
   chphtml = bs4.BeautifulSoup(chapter.text, 'lxml')
 
+  #make it faster by straining
+  chphtml = chphtml.find(id="primary")
+
   #Finds the element for chapter title then takes the text out of it.
   chptitle = chphtml.find(class_='chapter-title')
   chptitle = chptitle.get_text()
   print("Chapter Title: " + chptitle + "\n \n")
 
   #exit()
-
-  #Finds element for chaptertext then finds all elements with <a> tag then takes all text with element tags out.
-  chpraw = chphtml.find(id='chp_raw')
-  chprawp = chpraw.find_all('p')
 
   #Declares authornote normal and chapter text normal variables
   annorm = ""
@@ -153,13 +153,19 @@ def chpdata(URL,passes):
     for i in anrawp:
       annorm += i.get_text() + "\n \n"
 
+  #Finds element for chaptertext then finds all elements with <p> tag then takes all text with element tags out. If it finds the authornotes elements inside, it will decompose them.
+  chpraw = chphtml.find(id='chp_raw')
+  if chpraw.find(class_='wi_authornotes'):
+    chpraw.find(class_='wi_authornotes').decompose
+  chprawp = chpraw.find_all('p')
+
 
   #Goes through the text with element tags and replaces tags with double new line and adds it to chapter text normal variable
   for i in chprawp:
     chpnorm += i.get_text() + "\n \n"
 
   #The chapter contains the authornote normally so this uses the authornote we extracted and replaces it with nothingness in the chapter text
-  chpnorm = chpnorm.replace(annorm,"")
+  #chpnorm = chpnorm.replace(annorm,"")
 
 
   print("Chapter Text: " + chpnorm + "\n \n \n")
