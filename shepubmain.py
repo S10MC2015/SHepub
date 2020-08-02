@@ -120,7 +120,7 @@ book.add_metadata('DC', 'description', synopsis)
 c0 = epub.EpubHtml(title='Details',
                    file_name='details.xhtml',
                    lang='en')
-ch0fix = bs4.BeautifulSoup('<html><body><h1>'+ storytitle +'</h1><h2> Details about the story</hl2><p>Created by: '+ authorname +'</p><p>Last Chapter Upload: '+ latestchpupload +'</p><p></p><p>Synopsis: '+ synopsis +'</p><p></p><p>Genre: '+ genre +'</p><p>Tags: '+ tags +'</p><p></p><p>Ebook made using SHepub</p></body></html>')
+ch0fix = bs4.BeautifulSoup('<html><body><h2>'+ storytitle +'</h2><h3> Details about the story.</h3><p>Created by: '+ authorname +'</p><p>Last Chapter Upload: '+ latestchpupload +'</p><p></p><p>Genre: '+ genre +'</p><p></p><p>Tags: '+ tags +'</p><p></p><p>Ebook made using SHepub.</p><p></p><p>Synopsis: '+ synopsis +'</p></body></html>')
 
 ch0fix = ch0fix.prettify()
 c0.set_content(ch0fix)
