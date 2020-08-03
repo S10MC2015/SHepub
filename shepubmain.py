@@ -122,6 +122,7 @@ book.set_language('en')
 book.add_author(authorname)
 #book.set_cover(coverimage, open(coverimage, 'rb').read())
 book.add_metadata('DC', 'description', synopsis)
+book.add_metadata('<item href="OEBPS/stylesheet.css" id="style" media-type="text/css"/>')
 
 #synopsisbook = bytes(synopsisraw.get_text(), 'utf-8')
 #synopsisbook = synopsisraw.get_text()
@@ -132,7 +133,7 @@ book.add_metadata('DC', 'description', synopsis)
 #exit()
 synopsisbook = str(synopsisraw)
 
-ch0fix = bs4.BeautifulSoup('<html><head><meta http-equiv="Content-Type" content="application/xhtml+xml; charset=utf-8" /></head><body><h2>'+ storytitle +'</h2><h3> Details about the story.</h3><p>Created by: '+ authorname +'</p><p>Last Chapter Upload: '+ latestchpupload +'</p><p></p><p>Genre: '+ genre +'</p><p></p><p>Tags: '+ tags +'</p><p></p><p>Ebook made using SHepub.</p><p></p><p>Synopsis: '+ synopsisbook +'</p></body></html>', features="lxml")
+ch0fix = bs4.BeautifulSoup('<html><head><link href="stylesheet.css" type="text/css" rel="stylesheet"/><meta http-equiv="Content-Type" content="application/xhtml+xml; charset=utf-8" /></head><body><h2>'+ storytitle +'</h2><h3> Details about the story.</h3><p>Created by: '+ authorname +'</p><p>Last Chapter Upload: '+ latestchpupload +'</p><p></p><p>Genre: '+ genre +'</p><p></p><p>Tags: '+ tags +'</p><p></p><p>Ebook made using SHepub.</p><p></p><p>Synopsis: '+ synopsisbook +'</p></body></html>', features="lxml")
 
 #ch0fix = bs4.BeautifulSoup(b'<html><head><meta http-equiv="Content-Type" content="application/xhtml+xml; charset=utf-8" /></head><body><h2>'+ bytes(storytitle, 'utf-8') +'</h2><h3> Details about the story.</h3><p>Created by: '+ bytes(authorname, 'utf-8') +'</p><p>Last Chapter Upload: '+ bytes(latestchpupload, 'utf-8') +'</p><p></p><p>Genre: '+ bytes(genre, 'utf-8') +'</p><p></p><p>Tags: '+ bytes(tags, 'utf-8') +'</p><p></p><p>Ebook made using SHepub.</p><p></p><p>Synopsis: '+ bytes(synopsisbook, 'utf-8') +'</p></body></html>')
 
@@ -165,7 +166,7 @@ book.add_item(nav_css)
 book.spine = [nav_css, ch0]
 book.add_item(epub.EpubNcx())
 book.add_item(epub.EpubNav())
-epub.write_epub('test.epub', book)
+epub.write_epub('shepubtest.epub', book)
 exit()
 URL = firstchpurl
 
