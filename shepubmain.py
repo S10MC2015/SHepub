@@ -132,7 +132,7 @@ book.add_metadata('DC', 'description', synopsis)
 #exit()
 synopsisbook = str(synopsisraw)
 
-ch0fix = bs4.BeautifulSoup('<html><head><link href="stylesheet.css" type="text/css" rel="stylesheet"/><meta http-equiv="Content-Type" content="application/xhtml+xml; charset=utf-8" /></head><body><h2>'+ storytitle +'</h2><h3> Details about the story.</h3><p>Created by: '+ authorname +'</p><p>Last Chapter Upload: '+ latestchpupload +'</p><p></p><p>Genre: '+ genre +'</p><p></p><p>Tags: '+ tags +'</p><p></p><p>Ebook made using SHepub.</p><p></p><p>Synopsis: '+ synopsisbook +'</p></body></html>', features="lxml")
+ch0fix = bs4.BeautifulSoup('<html><link href="stylesheet.css" type="text/css" rel="stylesheet"/><head><meta http-equiv="Content-Type" content="application/xhtml+xml; charset=utf-8" /></head><body><h2>'+ storytitle +'</h2><h3> Details about the story.</h3><p>Created by: '+ authorname +'</p><p>Last Chapter Upload: '+ latestchpupload +'</p><p></p><p>Genre: '+ genre +'</p><p></p><p>Tags: '+ tags +'</p><p></p><p>Ebook made using SHepub.</p><p></p><p>Synopsis: '+ synopsisbook +'</p></body></html>', features="lxml")
 
 #ch0fix = bs4.BeautifulSoup(b'<html><head><meta http-equiv="Content-Type" content="application/xhtml+xml; charset=utf-8" /></head><body><h2>'+ bytes(storytitle, 'utf-8') +'</h2><h3> Details about the story.</h3><p>Created by: '+ bytes(authorname, 'utf-8') +'</p><p>Last Chapter Upload: '+ bytes(latestchpupload, 'utf-8') +'</p><p></p><p>Genre: '+ bytes(genre, 'utf-8') +'</p><p></p><p>Tags: '+ bytes(tags, 'utf-8') +'</p><p></p><p>Ebook made using SHepub.</p><p></p><p>Synopsis: '+ bytes(synopsisbook, 'utf-8') +'</p></body></html>')
 
@@ -153,7 +153,7 @@ book.add_item(ch0)
 #print(ch0fix)
 #print(ch0.get_content())
 #exit()
-style = 'body { font-family: Open Sans, Lato, serif;}'#  background-color: #ffffff; text-align: justify; margin: 2%; adobe-hyphenate: none; } pre { font-size: x-small; } h1 { text-align: center; } h2 { text-align: center; } h3 { text-align: center; } h4 { text-align: center; } h5 { text-align: center; } h6 { text-align: center; } .CI { text-align:center; margin-top:0px; margin-bottom:0px; padding:0px; } .center {text-align: center;} .cover {text-align: center;} .full     {width: 100%; } .quarter  {width: 25%; } .smcap {font-variant: small-caps;} .u {text-decoration: underline;} .bold {font-weight: bold;} .big { font-size: larger; } .small { font-size: smaller; }'
+style = 'body { font-family: Open Sans, Lato;}'#  background-color: #ffffff; text-align: justify; margin: 2%; adobe-hyphenate: none; } pre { font-size: x-small; } h1 { text-align: center; } h2 { text-align: center; } h3 { text-align: center; } h4 { text-align: center; } h5 { text-align: center; } h6 { text-align: center; } .CI { text-align:center; margin-top:0px; margin-bottom:0px; padding:0px; } .center {text-align: center;} .cover {text-align: center;} .full     {width: 100%; } .quarter  {width: 25%; } .smcap {font-variant: small-caps;} .u {text-decoration: underline;} .bold {font-weight: bold;} .big { font-size: larger; } .small { font-size: smaller; }'
 
 default_css = epub.EpubItem(uid="style",
                         file_name="OEBPS/stylesheet.css",
