@@ -122,7 +122,6 @@ book.set_language('en')
 book.add_author(authorname)
 #book.set_cover(coverimage, open(coverimage, 'rb').read())
 book.add_metadata('DC', 'description', synopsis)
-book.add_metadata('<item href="OEBPS/stylesheet.css" id="style" media-type="text/css"/>')
 
 #synopsisbook = bytes(synopsisraw.get_text(), 'utf-8')
 #synopsisbook = synopsisraw.get_text()
@@ -156,14 +155,14 @@ book.add_item(ch0)
 #exit()
 style = 'body { font-family: Open Sans, Lato, serif;}'#  background-color: #ffffff; text-align: justify; margin: 2%; adobe-hyphenate: none; } pre { font-size: x-small; } h1 { text-align: center; } h2 { text-align: center; } h3 { text-align: center; } h4 { text-align: center; } h5 { text-align: center; } h6 { text-align: center; } .CI { text-align:center; margin-top:0px; margin-bottom:0px; padding:0px; } .center {text-align: center;} .cover {text-align: center;} .full     {width: 100%; } .quarter  {width: 25%; } .smcap {font-variant: small-caps;} .u {text-decoration: underline;} .bold {font-weight: bold;} .big { font-size: larger; } .small { font-size: smaller; }'
 
-nav_css = epub.EpubItem(uid="style_nav",
+default_css = epub.EpubItem(uid="style_default",
                         file_name="OEBPS/stylesheet.css",
                         media_type="text/css",
                         content=style)
 
-book.add_item(nav_css)
+book.add_item(default_css)
 
-book.spine = [nav_css, ch0]
+book.spine = [default_css, ch0]
 book.add_item(epub.EpubNcx())
 book.add_item(epub.EpubNav())
 epub.write_epub('shepubtest.epub', book)
