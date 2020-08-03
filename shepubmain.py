@@ -3,7 +3,8 @@
 #https://realpython.com/beautiful-soup-web-scraper-python/#what-is-web-scraping for teaching me how to web scrape
 #That guy on the python discord who helped me
 #Another guy on python discord who helped me
-#Thanks to fanficfare for inadvertantly teaching me what decompose does and i really wish i knew you existed before i started this lol
+#Thanks to fanficfare for inadvertantly teaching me what decompose does and i really wish i knew you existed before i started this lol.
+#Also thank you to fanficfare as i used your stylesheet without permission please forgive me.
 #https://stackoverflow.com/a/35156699 for venv.sh thing
 #Also Thanks to Ghost and Ultra for the help.
 
@@ -14,12 +15,12 @@ import bs4
 import ebooklib
 from ebooklib import epub
 import datetime
-#import logging
+import logging
 
-#logging.basicConfig(format='%(asctime)s %(message)s', #filemode="w", filename = "latest.log",level=logging.INFO, #datefmt='%d-%m-%Y %H:%M:%S')
-#logging.getLogger().addHandler(logging.StreamHandler())
+logging.basicConfig(format='%(asctime)s %(message)s', filemode="w", filename = "latest.log",level=logging.DEBUG, datefmt='%d-%m-%Y %H:%M:%S')
+logging.getLogger().addHandler(logging.StreamHandler())
 
-#logging.log("Logging is enabled! \n \n")
+logging.debug("Logging is enabled! \n \n")
 
 book = epub.EpubBook()
 
@@ -34,7 +35,7 @@ chpnorm = ""
 passes = 0
 
 #URL of SH story.
-URL = input("Please put in the URL of the story. Eg. https://www.scribblehub.com/read/14190-the-novels-redemption/ \n \n")
+URL = input("Please put in the URL of the story. Eg. https://www.scribblehub.com/series/14190/the-novels-redemption/ \n \n")
 
 #Requests the story startpage and stores the html code into startpage variable. Then uses BeautifulSoup to get the actual contents.
 startpage = requests.get(URL)
@@ -106,8 +107,13 @@ firstchpurl = firstchpurl.find('a')['href']
 print("First Chapter URL: " + firstchpurl + "\n \n")
 
 bookid = URL
-bookid = bookid.replace("https://www.scribblehub.com/series/","")
+bookid = bookid.replace("https://","")
+bookid = bookid.replace("http://","")
+bookid = bookid.replace("www.scribblehub.com/read/","")
+bookid = bookid.replace("www.scribblehub.com/series/","")
 bookid = bookid.replace("/","")
+bookid = bookid.replace("-","")
+bookid = bookid.replace("_","")
 
 book.set_identifier(bookid)
 book.set_title(storytitle)
@@ -117,18 +123,46 @@ book.add_author(authorname)
 #book.set_cover(coverimage, open(coverimage, 'rb').read())
 book.add_metadata('DC', 'description', synopsis)
 
-c0 = epub.EpubHtml(title='Details',
+#synopsisbook = bytes(synopsisraw.get_text(), 'utf-8')
+synopsisbook = synopsisraw.get_text()
+
+#ch0fix = bs4.BeautifulSoup(b'<html><head><meta http-equiv="Content-Type" content="application/xhtml+xml; charset=utf-8" /></head><body><h2>'+ storytitle +'</h2><h3> Details about the story.</h3><p>Created by: '+ authorname +'</p><p>Last Chapter Upload: '+ latestchpupload +'</p><p></p><p>Genre: '+ genre +'</p><p></p><p>Tags: '+ tags +'</p><p></p><p>Ebook made using SHepub.</p><p></p><p>Synopsis: '+ synopsisbook +'</p></body></html>')
+
+ch0fix = bs4.BeautifulSoup('<html><head><meta http-equiv="Content-Type" content="application/xhtml+xml; charset=utf-8" /></head><body><h2>'+ storytitle +'</h2><h3> Details about the story.</h3><p>Created by: '+ authorname +'</p><p>Last Chapter Upload: '+ latestchpupload +'</p><p></p><p>Genre: '+ genre +'</p><p></p><p>Tags: '+ tags +'</p><p></p><p>Ebook made using SHepub.</p><p></p><p>Synopsis: '+ synopsisbook +'</p></body></html>')
+
+#ch0fix = bs4.BeautifulSoup(b'<html><head><meta http-equiv="Content-Type" content="application/xhtml+xml; charset=utf-8" /></head><body><h2>'+ bytes(storytitle, 'utf-8') +'</h2><h3> Details about the story.</h3><p>Created by: '+ bytes(authorname, 'utf-8') +'</p><p>Last Chapter Upload: '+ bytes(latestchpupload, 'utf-8') +'</p><p></p><p>Genre: '+ bytes(genre, 'utf-8') +'</p><p></p><p>Tags: '+ bytes(tags, 'utf-8') +'</p><p></p><p>Ebook made using SHepub.</p><p></p><p>Synopsis: '+ bytes(synopsisbook, 'utf-8') +'</p></body></html>')
+
+ch0 = epub.EpubHtml(title='Details',
                    file_name='details.xhtml',
                    lang='en')
-ch0fix = bs4.BeautifulSoup('<html><body><h2>'+ storytitle +'</h2><h3> Details about the story.</h3><p>Created by: '+ authorname +'</p><p>Last Chapter Upload: '+ latestchpupload +'</p><p></p><p>Genre: '+ genre +'</p><p></p><p>Tags: '+ tags +'</p><p></p><p>Ebook made using SHepub.</p><p></p><p>Synopsis: '+ synopsis +'</p></body></html>')
 
 ch0fix = ch0fix.prettify()
-c0.set_content(ch0fix)
-book.add_item(ch0)
+ch0fix = ch0fix.replace("\n","")
+ch0fix = ch0fix.replace("  ","")
+ch0fix = ch0fix.replace("> <","><")
 #print(ch0fix)
-#print(c0.get_content())
+ch0.content = ch0fix
+#logging.debug(ch0.content) # correct output
+#ch0.set_content(ch0fix)
+book.add_item(ch0)
+#logging.debug(ch0.get_content()) # breaks
+#print(ch0fix)
+#print(ch0.get_content())
 #exit()
+style = 'body { font-family: Open Sans, Lato, serif;  background-color: #ffffff; text-align: justify; margin: 2%; adobe-hyphenate: none; } pre { font-size: x-small; } h1 { text-align: center; } h2 { text-align: center; } h3 { text-align: center; } h4 { text-align: center; } h5 { text-align: center; } h6 { text-align: center; } .CI { text-align:center; margin-top:0px; margin-bottom:0px; padding:0px; } .center {text-align: center;} .cover {text-align: center;} .full     {width: 100%; } .quarter  {width: 25%; } .smcap {font-variant: small-caps;} .u {text-decoration: underline;} .bold {font-weight: bold;} .big { font-size: larger; } .small { font-size: smaller; }'
 
+nav_css = epub.EpubItem(uid="style_nav",
+                        file_name="OEBPS/stylesheet.css",
+                        media_type="text/css",
+                        content=style)
+
+book.add_item(nav_css)
+
+book.spine = [nav_css, ch0]
+book.add_item(epub.EpubNcx())
+book.add_item(epub.EpubNav())
+epub.write_epub('test.epub', book)
+exit()
 URL = firstchpurl
 
 def chpdata(URL,passes):
