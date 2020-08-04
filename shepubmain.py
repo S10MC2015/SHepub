@@ -36,6 +36,7 @@ def gettime():
 annorm = ""
 chpnorm = ""
 passes = 0
+chpcontent = []
 
 #URL of SH story.
 #URL = input("Please put in the URL of the story. Eg. https://www.scribblehub.com/series/14190/the-novels-redemption/ \n \n")
@@ -210,11 +211,22 @@ def chpdata(URL,passes):
   #  for i in anrawp:
   #    annorm += i.get_text() + "\n \n"
 
+
+
   #Finds element for chaptertext then finds all elements with <p> tag then takes all text with element tags out. If it finds the authornotes elements inside, it will decompose them.
   chpraw = chphtml.find(id='chp_raw')
   if chpraw.find(class_='wi_authornotes'):
     chpraw.find(class_='wi_authornotes').decompose
 
+  if anraw == None:
+    chpcontentsingle = ("%s" % (chpraw))
+  else:
+    chpcontentsingle = ("%s Author Notes: %s" % (chpraw, anraw))
+
+  chpcontent.append(chpcontentsingle)
+  logging.debug(chpcontentsingle)
+  #logging.debug(chpcontent)
+  #exit()
   #chprawp = chpraw.find_all('p')
 
 
@@ -234,6 +246,7 @@ def chpdata(URL,passes):
   if nextchpurl == None:
     #ebookmake
 
+    logging.debug(chpcontent)
     print("Passes: ", passes)
     gettime()
     endtime = "End Time of Scraping: %s" %(gettime.timestr)
