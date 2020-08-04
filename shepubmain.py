@@ -17,13 +17,16 @@ from ebooklib import epub
 import datetime
 import logging
 
+#logging things to both treminal and file for some of the testing
 logging.basicConfig(format='%(asctime)s %(message)s', filemode="w", filename = "latest.log",level=logging.DEBUG, datefmt='%d-%m-%Y %H:%M:%S')
 logging.getLogger().addHandler(logging.StreamHandler())
 
 logging.debug("Logging is enabled! \n \n")
 
+#create the book variable
 book = epub.EpubBook()
 
+#function for current time
 def gettime():
   time = datetime.datetime.now()
   gettime.timestr = time.strftime("%d-%m-%Y  %H:%M:%S")
@@ -41,8 +44,10 @@ URL = input("Please put in the URL of the story. Eg. https://www.scribblehub.com
 startpage = requests.get(URL)
 sphtml = bs4.BeautifulSoup(startpage.text, 'lxml')
 
+#gets current time with function and then logs it
 gettime()
-print("Start Time of Scraping: ",gettime.timestr)
+starttime = "Start Time of Scraping: ", gettime.timestr
+logging.debug(starttime)
 
 #Finds the element for author name then takes the text out of it.
 storytitle = sphtml.find(class_='fic_title')
