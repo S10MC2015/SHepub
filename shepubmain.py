@@ -18,7 +18,7 @@ import datetime
 import logging
 
 #logging things to both treminal and file for some of the testing
-logging.basicConfig(format='%(asctime)s %(message)s', filemode="w", filename = "latest.log",level=logging.DEBUG, datefmt='%d-%m-%Y %H:%M:%S')
+logging.basicConfig(format='%(asctime)s %(message)s \n \n', filemode="w", filename = "latest.log",level=logging.DEBUG, datefmt='%d-%m-%Y %H:%M:%S')
 logging.getLogger().addHandler(logging.StreamHandler())
 
 logging.debug("Logging is enabled! \n \n")
@@ -38,7 +38,9 @@ chpnorm = ""
 passes = 0
 
 #URL of SH story.
-URL = input("Please put in the URL of the story. Eg. https://www.scribblehub.com/series/14190/the-novels-redemption/ \n \n")
+#URL = input("Please put in the URL of the story. Eg. https://www.scribblehub.com/series/14190/the-novels-redemption/ \n \n")
+logging.debug("Auto URL to https://www.scribblehub.com/series/14190/the-novels-redemption/ to save dev time. \n Remove in release. \n \n")
+URL = "https://www.scribblehub.com/series/14190/the-novels-redemption/"
 
 #Requests the story startpage and stores the html code into startpage variable. Then uses BeautifulSoup to get the actual contents.
 startpage = requests.get(URL)
@@ -46,7 +48,7 @@ sphtml = bs4.BeautifulSoup(startpage.text, 'lxml')
 
 #gets current time with function and then logs it
 gettime()
-starttime = "Start Time of Scraping: ", gettime.timestr
+starttime = "Start Time of Scraping: %s" %(gettime.timestr)
 logging.debug(starttime)
 
 #Finds the element for author name then takes the text out of it.
@@ -111,6 +113,7 @@ firstchpurl = sphtml.find(class_='read_buttons')
 firstchpurl = firstchpurl.find('a')['href']
 print("First Chapter URL: " + firstchpurl + "\n \n")
 
+#create book uid but i am an idiot.
 bookid = URL
 bookid = bookid.replace("https://","")
 bookid = bookid.replace("http://","")
@@ -120,6 +123,7 @@ bookid = bookid.replace("/","")
 bookid = bookid.replace("-","")
 bookid = bookid.replace("_","")
 
+#set some of the things for the book
 book.set_identifier(bookid)
 book.set_title(storytitle)
 book.set_language('eng')
@@ -171,7 +175,7 @@ book.spine = [ch0]
 book.add_item(epub.EpubNcx())
 book.add_item(epub.EpubNav())
 epub.write_epub('shepubtest.epub', book)
-exit()
+#exit() #for testing
 URL = firstchpurl
 
 def chpdata(URL,passes):
@@ -198,43 +202,46 @@ def chpdata(URL,passes):
 
   #Finds element for authornote then finds all elements with <a> tag then takes all text with element tags out.
   anraw = chphtml.find(class_='wi_authornotes_body')
-  if anraw == None:
-    pass
-  else:
-    anrawp = anraw.find_all('p')
-    #Goes through the text with element tags and replaces tags with double new line and adds it to authornote normal variable
-    for i in anrawp:
-      annorm += i.get_text() + "\n \n"
+  #if anraw == None:
+  #  pass
+  #else:
+  #  anrawp = anraw.find_all('p')
+  #  #Goes through the text with element tags and replaces tags with double new line and adds it to authornote normal variable
+  #  for i in anrawp:
+  #    annorm += i.get_text() + "\n \n"
 
   #Finds element for chaptertext then finds all elements with <p> tag then takes all text with element tags out. If it finds the authornotes elements inside, it will decompose them.
   chpraw = chphtml.find(id='chp_raw')
   if chpraw.find(class_='wi_authornotes'):
     chpraw.find(class_='wi_authornotes').decompose
-  chprawp = chpraw.find_all('p')
+
+  #chprawp = chpraw.find_all('p')
 
 
   #Goes through the text with element tags and replaces tags with double new line and adds it to chapter text normal variable
-  for i in chprawp:
-    chpnorm += i.get_text() + "\n \n"
+  #for i in chprawp:
+ #   chpnorm += i.get_text() + "\n \n"
 
   #The chapter contains the authornote normally so this uses the authornote we extracted and replaces it with nothingness in the chapter text
   #chpnorm = chpnorm.replace(annorm,"")
 
 
-  print("Chapter Text: " + chpnorm + "\n \n \n")
-  print("AuthorNote: " + annorm + "\n \n \n")
+  #logging.debug("Chapter Text: " + chpnorm + "\n \n \n")
+  #logging.debug("AuthorNote: " + annorm + "\n \n \n")
 
   #Finds element for the read button then finds the hyperlink url.
   nextchpurl = chphtml.find(class_='btn-wi btn-next')
   if nextchpurl == None:
     #ebookmake
-    print("Passes: ",passes)
+
+    print("Passes: ", passes)
     gettime()
-    print("End Time of Scraping: ",gettime.timestr)
+    endtime = "End Time of Scraping: %s" %(gettime.timestr)
+    logging.debug(endtime)
     exit()
   else:
     nextchpurl = nextchpurl['href']
-    print("Next Chapter URL: " + nextchpurl + "\n \n \n \n")
+    logging.debug("Next Chapter URL: " + nextchpurl + "\n \n \n \n")
 #    if 'chapter' in globals():
 #      del chapter
 #    if 'chphtml' in globals():
@@ -255,7 +262,7 @@ def chpdata(URL,passes):
 #      del anrawp
 #    if 'l' in globals():
 #      del l
-    print("Passes: ",passes)
+    print("Passes: ", passes)
     chpdata(nextchpurl,passes)
 
 
