@@ -21,7 +21,7 @@ import logging
 logging.basicConfig(format='%(asctime)s %(message)s \n \n', filemode="w", filename = "latest.log",level=logging.DEBUG, datefmt='%d-%m-%Y %H:%M:%S')
 logging.getLogger().addHandler(logging.StreamHandler())
 
-logging.debug("Logging is enabled! \n \n")
+logging.debug("\n Logging is enabled! \n \n")
 
 #create the book variable
 book = epub.EpubBook()
@@ -133,21 +133,11 @@ book.set_identifier(bookid)
 book.set_title(storytitle)
 book.set_language('en')
 book.add_author(authorname)
-#book.set_cover(coverimage, open(coverimage, 'rb').read())
 book.add_metadata('DC', 'description', synopsis)
 
-#synopsisbook = bytes(synopsisraw.get_text(), 'utf-8')
-#synopsisbook = synopsisraw.get_text()
-
-#ch0fix = bs4.BeautifulSoup(b'<html><head><meta http-equiv="Content-Type" content="application/xhtml+xml; charset=utf-8" /></head><body><h2>'+ storytitle +'</h2><h3> Details about the story.</h3><p>Created by: '+ authorname +'</p><p>Last Chapter Upload: '+ latestchpupload +'</p><p></p><p>Genre: '+ genre +'</p><p></p><p>Tags: '+ tags +'</p><p></p><p>Ebook made using SHepub.</p><p></p><p>Synopsis: '+ synopsisbook +'</p></body></html>')
-
-#print(synopsisraw)
-#exit()
 synopsisbook = str(synopsisraw)
 
 ch0fix = bs4.BeautifulSoup('<html><link href="stylesheet.css" type="text/css" rel="stylesheet"/><head><meta http-equiv="Content-Type" content="application/xhtml+xml; charset=utf-8" /></head><body><h2>'+ storytitle +'</h2><h3> Details about the story.</h3><p>Created by: '+ authorname +'</p><p>Last Chapter Upload: '+ latestchpupload +'</p><p></p><p>Genre: '+ genre +'</p><p></p><p>Tags: '+ tags +'</p><p></p><p>Ebook made using SHepub.</p><p></p><p>Synopsis: '+ synopsisbook +'</p></body></html>', features="lxml")
-
-#ch0fix = bs4.BeautifulSoup(b'<html><head><meta http-equiv="Content-Type" content="application/xhtml+xml; charset=utf-8" /></head><body><h2>'+ bytes(storytitle, 'utf-8') +'</h2><h3> Details about the story.</h3><p>Created by: '+ bytes(authorname, 'utf-8') +'</p><p>Last Chapter Upload: '+ bytes(latestchpupload, 'utf-8') +'</p><p></p><p>Genre: '+ bytes(genre, 'utf-8') +'</p><p></p><p>Tags: '+ bytes(tags, 'utf-8') +'</p><p></p><p>Ebook made using SHepub.</p><p></p><p>Synopsis: '+ bytes(synopsisbook, 'utf-8') +'</p></body></html>')
 
 ch0 = epub.EpubHtml(title='Details',
                    file_name='OEBPS/details.xhtml',
@@ -157,15 +147,11 @@ ch0fix = ch0fix.prettify()
 ch0fix = ch0fix.replace("\n","")
 ch0fix = ch0fix.replace("  ","")
 ch0fix = ch0fix.replace("> <","><")
-#print(ch0fix)
+
 ch0.content = ch0fix
-#logging.debug(ch0.content) # correct output
-#ch0.set_content(ch0fix)
+
 book.add_item(ch0)
-#logging.debug(ch0.get_content()) # breaks
-#print(ch0fix)
-#print(ch0.get_content())
-#exit()
+
 style = 'body { font-family: Open Sans, Lato;}'#  background-color: #ffffff; text-align: justify; margin: 2%; adobe-hyphenate: none; } pre { font-size: x-small; } h1 { text-align: center; } h2 { text-align: center; } h3 { text-align: center; } h4 { text-align: center; } h5 { text-align: center; } h6 { text-align: center; } .CI { text-align:center; margin-top:0px; margin-bottom:0px; padding:0px; } .center {text-align: center;} .cover {text-align: center;} .full     {width: 100%; } .quarter  {width: 25%; } .smcap {font-variant: small-caps;} .u {text-decoration: underline;} .bold {font-weight: bold;} .big { font-size: larger; } .small { font-size: smaller; }'
 
 nav_css = epub.EpubItem(uid="style_nav",
@@ -173,12 +159,8 @@ nav_css = epub.EpubItem(uid="style_nav",
                         media_type="text/css",
                         content=style)
 
-#book.add_item(nav_css)
 book.spine = [ch0]
-#book.add_item(epub.EpubNcx())
-#book.add_item(epub.EpubNav())
-#epub.write_epub('shepubtest.epub', book)
-#exit() #for testing
+
 URL = firstchpurl
 
 def chpdata(URL,passes):
@@ -197,35 +179,21 @@ def chpdata(URL,passes):
   chptitle = chptitle.get_text()
   print("Chapter Title: " + chptitle + "\n \n")
 
-  #exit()
-
   #Declares authornote normal and chapter text normal variables
   annorm = ""
   chpnorm = ""
 
   #Finds element for authornote then finds all elements with <a> tag then takes all text with element tags out.
   anraw = chphtml.find(class_='wi_authornotes_body')
-  #if anraw == None:
-  #  pass
-  #else:
-  #  anrawp = anraw.find_all('p')
-  #  #Goes through the text with element tags and replaces tags with double new line and adds it to authornote normal variable
-  #  for i in anrawp:
-  #    annorm += i.get_text() + "\n \n"
-
-
 
   #Finds element for chaptertext then finds all elements with <p> tag then takes all text with element tags out. If it finds the authornotes elements inside, it will decompose them.
   chpraw = chphtml.find(id='chp_raw')
   if chpraw.find(class_='sp-wrap sp-wrap-default'):
     chpraw.find(class_='sp-wrap sp-wrap-default').decompose
 
-  #chpraw = chpraw.prettify()
-
   if anraw == None:
     chpcontentsingle = ("%s" % (chpraw))
   else:
-    #anraw = anraw.prettify
     chpcontentsingle = ("%s Author Notes: %s" % (chpraw, anraw))
 
   chpcontentsingle = chpcontentsingle.replace("\n","")
@@ -234,41 +202,13 @@ def chpdata(URL,passes):
   chptitle = chptitle.replace("\'","")
 
   chpcontentsinglefix = bs4.BeautifulSoup('<html><link href="stylesheet.css" type="text/css" rel="stylesheet"/><meta http-equiv="Content-Type" content="application/xhtml+xml; charset=utf-8" /><body><h2>'+ chptitle +'</h2><p></p>'+ chpcontentsingle +'</body></html>', features="lxml")
-
   
-
   chptitlelist.append(chptitle)
   chpcontentraw.append(chpcontentsinglefix)
-  #logging.debug(chpcontentsinglefix)
-  print("logging.debug(chpcontentsinglefix) hs been disabled due to lag.")
-
-  #logging.debug(chpcontentraw)
-  #exit()
-  #chprawp = chpraw.find_all('p')
-
-
-  #Goes through the text with element tags and replaces tags with double new line and adds it to chapter text normal variable
-  #for i in chprawp:
- #   chpnorm += i.get_text() + "\n \n"
-
-  #The chapter contains the authornote normally so this uses the authornote we extracted and replaces it with nothingness in the chapter text
-  #chpnorm = chpnorm.replace(annorm,"")
-
-
-  #logging.debug("Chapter Text: " + chpnorm + "\n \n \n")
-  #logging.debug("AuthorNote: " + annorm + "\n \n \n")
 
   #Finds element for the read button then finds the hyperlink url.
   nextchpurl = chphtml.find(class_='btn-wi btn-next')
   if nextchpurl == None:
-    #ebookmake
-
-    #for i in range(len(chpcontentraw)):
-      #chpcontentraw[i].replace("\n", "")
-
-    #[i.strip() for i in chpcontentraw]
-    #list(map(str.strip,chpcontentraw))
-
     chppathnum = 1
     chpcontent = []
 
@@ -281,16 +221,15 @@ def chpdata(URL,passes):
       book.add_item(chpcontent[i])
       book.spine.append(chpcontent[i])
       print(book.get_items())
-      #logging.debug(book.spine)
-      #logging.debug(chpcontentraw[i])
-      #logging.debug(chpcontent[i].content())
       chppathnum += 1
 
     book.add_item(nav_css)
-    #book.spine.insert(0,'nav')
     book.add_item(epub.EpubNcx())
     book.add_item(epub.EpubNav())
-    epub.write_epub('%s.epub' % storytitle, book)
+    book.toc = (epub.Link('OEBPS/details.xhtml', 'Details', 'ch0'),
+                 (epub.Section('EBook'), (ch0, chpcontent))
+                )
+    epub.write_epub('%s.epub' % storytitle, book, {})
 
     logging.debug(chpcontentraw)
     print("Passes: ", passes)
@@ -303,26 +242,6 @@ def chpdata(URL,passes):
   else:
     nextchpurl = nextchpurl['href']
     logging.debug("Next Chapter URL: " + nextchpurl + "\n \n \n \n")
-#    if 'chapter' in globals():
-#      del chapter
-#    if 'chphtml' in globals():
-#      del chphtml
-#    if 'chptitle' in globals():
-#      del chptitle
-#    if 'chpraw' in globals():
-#      del chpraw
-#    if 'chprawp' in globals():
-#      del chprawp
-#    if 'chpnorm' in globals():
-#      del chpnorm
-#    if 'annorm' in globals():
-#      del annorm
-#    if 'anraw' in globals():
-#      del anraw
-#    if 'anrawp' in globals():
-#      del anrawp
-#    if 'l' in globals():
-#      del l
     print("Passes: ", passes)
     chpdata(nextchpurl,passes)
 
