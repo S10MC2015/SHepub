@@ -215,16 +215,24 @@ def chpdata(URL,passes):
 
   #Finds element for chaptertext then finds all elements with <p> tag then takes all text with element tags out. If it finds the authornotes elements inside, it will decompose them.
   chpraw = chphtml.find(id='chp_raw')
-  if chpraw.find(class_='wi_authornotes'):
-    chpraw.find(class_='wi_authornotes').decompose
+  if chpraw.find(class_='sp-wrap sp-wrap-default'):
+    chpraw.find(class_='sp-wrap sp-wrap-default').decompose
+
+  #chpraw = chpraw.prettify()
 
   if anraw == None:
     chpcontentsingle = ("%s" % (chpraw))
   else:
+    #anraw = anraw.prettify
     chpcontentsingle = ("%s Author Notes: %s" % (chpraw, anraw))
 
+  chpcontentsingle = chpcontentsingle.replace("\n","")
+  chpcontentsingle = chpcontentsingle.replace("\'","")
+
   chpcontent.append(chpcontentsingle)
-  logging.debug(chpcontentsingle)
+  #logging.debug(chpcontentsingle)
+  print("logging.debug(chpcontentsingle) hs been disabled due to lag.")
+
   #logging.debug(chpcontent)
   #exit()
   #chprawp = chpraw.find_all('p')
@@ -246,8 +254,17 @@ def chpdata(URL,passes):
   if nextchpurl == None:
     #ebookmake
 
+    for i in range(len(chpcontent)):
+      chpcontent[i].replace("\n", "")
+
+    [i.strip() for i in chpcontent]
+    list(map(str.strip,chpcontent))
+
+
     logging.debug(chpcontent)
     print("Passes: ", passes)
+    chpcontentlen = len(chpcontent)
+    print("This should be the same number as passes. \n chpcontent.len() = ", chpcontentlen)
     gettime()
     endtime = "End Time of Scraping: %s" %(gettime.timestr)
     logging.debug(endtime)
