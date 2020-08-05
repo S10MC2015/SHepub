@@ -36,7 +36,8 @@ def gettime():
 annorm = ""
 chpnorm = ""
 passes = 0
-chpcontent = []
+chpcontentraw = []
+chptitlelist = []
 
 #URL of SH story.
 #URL = input("Please put in the URL of the story. Eg. https://www.scribblehub.com/series/14190/the-novels-redemption/ \n \n")
@@ -127,7 +128,6 @@ bookid = bookid.replace("_","")
 #set some of the things for the book
 book.set_identifier(bookid)
 book.set_title(storytitle)
-book.set_language('eng')
 book.set_language('en')
 book.add_author(authorname)
 #book.set_cover(coverimage, open(coverimage, 'rb').read())
@@ -165,17 +165,16 @@ book.add_item(ch0)
 #exit()
 style = 'body { font-family: Open Sans, Lato;}'#  background-color: #ffffff; text-align: justify; margin: 2%; adobe-hyphenate: none; } pre { font-size: x-small; } h1 { text-align: center; } h2 { text-align: center; } h3 { text-align: center; } h4 { text-align: center; } h5 { text-align: center; } h6 { text-align: center; } .CI { text-align:center; margin-top:0px; margin-bottom:0px; padding:0px; } .center {text-align: center;} .cover {text-align: center;} .full     {width: 100%; } .quarter  {width: 25%; } .smcap {font-variant: small-caps;} .u {text-decoration: underline;} .bold {font-weight: bold;} .big { font-size: larger; } .small { font-size: smaller; }'
 
-default_css = epub.EpubItem(uid="style",
-                        file_name="OEBPS/stylesheet.css",
+nav_css = epub.EpubItem(uid="style_nav",
+                        file_name="style/nav.css",
                         media_type="text/css",
                         content=style)
 
-book.add_item(default_css)
-
+#book.add_item(nav_css)
 book.spine = [ch0]
-book.add_item(epub.EpubNcx())
-book.add_item(epub.EpubNav())
-epub.write_epub('shepubtest.epub', book)
+#book.add_item(epub.EpubNcx())
+#book.add_item(epub.EpubNav())
+#epub.write_epub('shepubtest.epub', book)
 #exit() #for testing
 URL = firstchpurl
 
@@ -228,12 +227,19 @@ def chpdata(URL,passes):
 
   chpcontentsingle = chpcontentsingle.replace("\n","")
   chpcontentsingle = chpcontentsingle.replace("\'","")
+  chptitle = chptitle.replace("\n","")
+  chptitle = chptitle.replace("\'","")
 
-  chpcontent.append(chpcontentsingle)
-  #logging.debug(chpcontentsingle)
-  print("logging.debug(chpcontentsingle) hs been disabled due to lag.")
+  chpcontentsinglefix = bs4.BeautifulSoup('<html><link href="stylesheet.css" type="text/css" rel="stylesheet"/><meta http-equiv="Content-Type" content="application/xhtml+xml; charset=utf-8" /><body><h2>'+ chptitle +'</h2><p></p>'+ chpcontentsingle +'</body></html>', features="lxml")
 
-  #logging.debug(chpcontent)
+  
+
+  chptitlelist.append(chptitle)
+  chpcontentraw.append(chpcontentsinglefix)
+  #logging.debug(chpcontentsinglefix)
+  print("logging.debug(chpcontentsinglefix) hs been disabled due to lag.")
+
+  #logging.debug(chpcontentraw)
   #exit()
   #chprawp = chpraw.find_all('p')
 
@@ -254,17 +260,38 @@ def chpdata(URL,passes):
   if nextchpurl == None:
     #ebookmake
 
-    for i in range(len(chpcontent)):
-      chpcontent[i].replace("\n", "")
+    #for i in range(len(chpcontentraw)):
+      #chpcontentraw[i].replace("\n", "")
 
-    [i.strip() for i in chpcontent]
-    list(map(str.strip,chpcontent))
+    #[i.strip() for i in chpcontentraw]
+    #list(map(str.strip,chpcontentraw))
 
+    chppathnum = 1
+    chpcontent = []
 
-    logging.debug(chpcontent)
+    for i in range(len(chpcontentraw)):
+      chppath = 'OEBPS/ch%s.xhtml' % str(chppathnum)
+      chpcontent.append(epub.EpubHtml(title=chptitlelist[i],
+                      file_name=chppath,
+                      lang='en'))
+      chpcontent[i].content = chpcontentraw[i]
+      book.add_item(chpcontent[i])
+      book.spine.append(chpcontent[i])
+      #logging.debug(book.spine)
+      #logging.debug(chpcontentraw[i])
+      #logging.debug(chpcontent[i].content())
+      chppathnum += 1
+
+    book.add_item(nav_css)
+    book.spine.insert(0,'nav')
+    book.add_item(epub.EpubNcx())
+    book.add_item(epub.EpubNav())
+    epub.write_epub('%s.epub' % storytitle, book)
+
+    logging.debug(chpcontentraw)
     print("Passes: ", passes)
-    chpcontentlen = len(chpcontent)
-    print("This should be the same number as passes. \n chpcontent.len() = ", chpcontentlen)
+    chpcontentlen = len(chpcontentraw)
+    print("This should be the same number as passes. \n chpcontentraw.len() = ", chpcontentlen)
     gettime()
     endtime = "End Time of Scraping: %s" %(gettime.timestr)
     logging.debug(endtime)
