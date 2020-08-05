@@ -159,6 +159,8 @@ nav_css = epub.EpubItem(uid="style_nav",
                         media_type="text/css",
                         content=style)
 
+ch0.add_item(nav_css)
+
 book.spine = [ch0]
 
 URL = firstchpurl
@@ -218,6 +220,7 @@ def chpdata(URL,passes):
                       file_name=chppath,
                       lang='en'))
       chpcontent[i].content = chpcontentraw[i]
+      chpcontent[i].add_item(nav_css)
       book.add_item(chpcontent[i])
       book.spine.append(chpcontent[i])
       print(book.get_items())
@@ -226,7 +229,7 @@ def chpdata(URL,passes):
     book.add_item(nav_css)
     book.add_item(epub.EpubNcx())
     book.add_item(epub.EpubNav())
-    book.toc = (epub.Link('OEBPS/details.xhtml', 'Details', 'ch0'),
+    book.toc = (epub.Link('OEBPS/details.xhtml', 'Details', 'details'),
                  (epub.Section('EBook'), (ch0, chpcontent))
                 )
     epub.write_epub('%s.epub' % storytitle, book, {})
