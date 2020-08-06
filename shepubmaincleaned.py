@@ -150,16 +150,17 @@ ch0fix = ch0fix.replace("> <","><")
 
 ch0.content = ch0fix
 
-book.add_item(ch0)
 
 style = 'body { font-family: Open Sans, Lato;}'#  background-color: #ffffff; text-align: justify; margin: 2%; adobe-hyphenate: none; } pre { font-size: x-small; } h1 { text-align: center; } h2 { text-align: center; } h3 { text-align: center; } h4 { text-align: center; } h5 { text-align: center; } h6 { text-align: center; } .CI { text-align:center; margin-top:0px; margin-bottom:0px; padding:0px; } .center {text-align: center;} .cover {text-align: center;} .full     {width: 100%; } .quarter  {width: 25%; } .smcap {font-variant: small-caps;} .u {text-decoration: underline;} .bold {font-weight: bold;} .big { font-size: larger; } .small { font-size: smaller; }'
 
 nav_css = epub.EpubItem(uid="style_nav",
-                        file_name="style/nav.css",
+                        file_name="style\nav.css",
                         media_type="text/css",
                         content=style)
 
 ch0.add_item(nav_css)
+
+book.add_item(ch0)
 
 book.spine = [ch0]
 
@@ -215,23 +216,27 @@ def chpdata(URL,passes):
     chpcontent = []
 
     for i in range(len(chpcontentraw)):
-      chppath = 'OEBPS/ch%s.xhtml' % str(chppathnum)
-      chpcontent.append(epub.EpubHtml(title=chptitlelist[i],
-                      file_name=chppath,
-                      lang='en'))
-      chpcontent[i].content = chpcontentraw[i]
-      chpcontent[i].add_item(nav_css)
-      book.add_item(chpcontent[i])
-      book.spine.append(chpcontent[i])
-      print(book.get_items())
-      chppathnum += 1
+        chppath = 'OEBPS/ch%s.xhtml' % str(chppathnum)
+        chpcontent.append(epub.EpubHtml(title=chptitlelist[i], file_name=chppath, lang='en'))
+
+        chpcontentraw[i] = chpcontentraw[i].prettify()
+        chpcontentraw[i] = chpcontentraw[i].replace("\n","")
+        chpcontentraw[i] = chpcontentraw[i].replace("  ","")
+        chpcontentraw[i] = chpcontentraw[i].replace("> <","><")
+
+        chpcontent[i].content = chpcontentraw[i]
+        chpcontent[i].add_item(nav_css)
+        book.add_item(chpcontent[i])
+        book.spine.append(chpcontent[i])
+        chppathnum += 1
+
+    logging.debug(chpcontent)
 
     book.add_item(nav_css)
     book.add_item(epub.EpubNcx())
     book.add_item(epub.EpubNav())
-    book.toc = (epub.Link('OEBPS/details.xhtml', 'Details', 'details'),
-                 (epub.Section('EBook'), (ch0, chpcontent))
-                )
+    book.toc = [ch0, chpcontent[0], chpcontent[1], chpcontent[2]]
+
     epub.write_epub('%s.epub' % storytitle, book, {})
 
     logging.debug(chpcontentraw)
