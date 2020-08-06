@@ -162,6 +162,7 @@ ch0.add_item(nav_css)
 
 book.add_item(ch0)
 
+book.toc = [ch0]
 book.spine = [ch0]
 
 URL = firstchpurl
@@ -228,14 +229,14 @@ def chpdata(URL,passes):
         chpcontent[i].add_item(nav_css)
         book.add_item(chpcontent[i])
         book.spine.append(chpcontent[i])
+        book.toc.append(chpcontent[i])
         chppathnum += 1
 
     logging.debug(chpcontent)
 
     book.add_item(nav_css)
-    book.add_item(epub.EpubNcx())
+    #book.add_item(epub.EpubNcx())
     book.add_item(epub.EpubNav())
-    book.toc = [ch0, chpcontent[0], chpcontent[1], chpcontent[2]]
 
     epub.write_epub('%s.epub' % storytitle, book, {})
 
