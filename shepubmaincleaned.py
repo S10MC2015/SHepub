@@ -159,7 +159,7 @@ book.add_metadata('DC', 'description', synopsis)
 
 synopsisbook = str(synopsisraw)
 
-ch0fix = bs4.BeautifulSoup('<html><meta http-equiv="Content-Type" content="application/xhtml+xml; charset=utf-8" /><body><h2>'+ storytitle +'</h2><h3> Details about the story.</h3><p><img src="cover.jpg"/></p><p>Created by: '+ authorname +'</p><p>Last Chapter Upload: '+ latestchpupload +'</p><p></p><p>Genre: '+ genre +'</p><p></p><p>Tags: '+ tags +'</p><p></p><p>Scrapped at: '+ starttimetime +'</p><p>Ebook made using SHepub.</p><p></p><p>Synopsis: '+ synopsisbook +'</p></body></html>', features="lxml")
+ch0fix = bs4.BeautifulSoup('<html><meta http-equiv="Content-Type" content="application/xhtml+xml; charset=utf-8" /><body><h2>'+ storytitle +'</h2><h3> Details about the story.</h3><p>Created by: '+ authorname +'</p><p>Last Chapter Upload: '+ latestchpupload +'</p><p></p><p>Genre: '+ genre +'</p><p></p><p>Tags: '+ tags +'</p><p></p><p>Scrapped at: '+ starttimetime +'</p><p>Ebook made using SHepub.</p><p></p><p>Synopsis: '+ synopsisbook +'</p></body></html>', features="lxml")
 
 ch0 = epub.EpubHtml(title='Details',
                    file_name='OEBPS/details.xhtml',
