@@ -41,11 +41,11 @@ chpcontentraw = []
 chptitlelist = []
 
 #URL of SH story.
-#URL = input("Please put in the URL of the story. Eg. https://www.scribblehub.com/series/14190/the-novels-redemption/ \n \n")
-#logging.debug("Auto URL to https://www.scribblehub.com/series/14190/the-novels-redemption/ to save dev time. \n Remove in release. \n \n")
+URL = input("Please put in the URL of the story. Eg. https://www.scribblehub.com/series/14190/the-novels-redemption/ \n \n")
+logging.debug("Auto URL to https://www.scribblehub.com/series/14190/the-novels-redemption/ to save dev time. \n Remove in release. \n \n")
 #URL = "https://www.scribblehub.com/series/14190/the-novels-redemption/"
-logging.debug("Auto URL to https://www.scribblehub.com/series/150204/world-of-joy/ to save dev time. \n Remove in release. \n \n")
-URL = "https://www.scribblehub.com/series/150204/world-of-joy/"
+#logging.debug("Auto URL to https://www.scribblehub.com/series/150204/world-of-joy/ to save dev time. \n Remove in release. \n \n")
+#URL = "https://www.scribblehub.com/series/150204/world-of-joy/"
 
 
 #Requests the story startpage and stores the html code into startpage variable. Then uses BeautifulSoup to get the actual contents.
