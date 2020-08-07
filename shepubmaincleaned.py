@@ -78,6 +78,8 @@ print("Latest Chapter Upload Time: " + latestchpupload + "\n \n")
 #Finds element for synopsis then finds all text in the <p> tags. Then it adds then to the variable with line breaks.
 synopsisraw = sphtml.find(class_='wi_fic_desc')
 if synopsisraw == "":
+  synopsis = "No Synopsis found."
+  synopsisraw = "<p>No Synopsis found</p>"
   pass
 else:
   synopsisrawp = synopsisraw.find_all('p')
@@ -89,6 +91,8 @@ else:
 #Finds element for genre then finds all elements with <a> tag then takes all text out and adds comma+space. Next it adds an extra space to last one and replaces comma+space+space with a full stop.
 genreraw = sphtml.find(class_='wi_fic_genre')
 if genreraw == None:
+  genre = "No Genres found."
+  genreraw = "<p>No Genres found</p>"
   pass
 else:
   genrerawp = genreraw.find_all('a')
@@ -103,6 +107,8 @@ else:
 #Finds element for tags then finds all elements with <a> tag then takes all text out and adds comma+space. Next it adds an extra space to last one and replaces comma+space+space with a full stop.
 tagsraw = sphtml.find(class_='wi_fic_showtags_inner')
 if tagsraw == None:
+  tags = "No Tags found."
+  tagsraw = "<p>No Tags found</p>"
   pass
 else:
   tagsrawp = tagsraw.find_all('a')
@@ -116,7 +122,11 @@ else:
 #Finds element for the read button then finds the hyperlink url.
 firstchpurl = sphtml.find(class_='read_buttons')
 firstchpurl = firstchpurl.find('a')['href']
-print("First Chapter URL: " + firstchpurl + "\n \n")
+if firstchpurl == None:
+  logging.debug("No Chapters found. Exiting.")
+  exit()
+else:
+  print("First Chapter URL: " + firstchpurl + "\n \n")
 
 #create book uid but i am an idiot.
 bookid = URL
