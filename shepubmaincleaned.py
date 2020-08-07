@@ -14,6 +14,7 @@ import os
 import bs4
 import ebooklib
 from ebooklib import epub
+from zipfile import ZipFile
 import datetime
 import logging
 
@@ -54,6 +55,7 @@ sphtml = bs4.BeautifulSoup(startpage.text, 'lxml')
 #gets current time with function and then logs it
 gettime()
 starttime = "Start Time of Scraping: %s" %(gettime.timestr)
+starttimetime = gettime.timestr.replace("  "," ")
 logging.debug(starttime)
 
 #Finds the element for author name then takes the text out of it.
@@ -77,7 +79,7 @@ print("Latest Chapter Upload Time: " + latestchpupload + "\n \n")
 
 #Finds element for synopsis then finds all text in the <p> tags. Then it adds then to the variable with line breaks.
 synopsisraw = sphtml.find(class_='wi_fic_desc')
-if synopsisraw == "":
+if synopsisraw.find(class_='seriesna'):
   synopsis = "No Synopsis found."
   synopsisraw = "<p>No Synopsis found</p>"
   pass
@@ -90,7 +92,7 @@ else:
 
 #Finds element for genre then finds all elements with <a> tag then takes all text out and adds comma+space. Next it adds an extra space to last one and replaces comma+space+space with a full stop.
 genreraw = sphtml.find(class_='wi_fic_genre')
-if genreraw == None:
+if genreraw.find(class_='seriesna'):
   genre = "No Genres found."
   genreraw = "<p>No Genres found</p>"
   pass
@@ -106,7 +108,7 @@ else:
 
 #Finds element for tags then finds all elements with <a> tag then takes all text out and adds comma+space. Next it adds an extra space to last one and replaces comma+space+space with a full stop.
 tagsraw = sphtml.find(class_='wi_fic_showtags_inner')
-if tagsraw == None:
+if tagsraw.find(class_='seriesna'):
   tags = "No Tags found."
   tagsraw = "<p>No Tags found</p>"
   pass
@@ -147,7 +149,7 @@ book.add_metadata('DC', 'description', synopsis)
 
 synopsisbook = str(synopsisraw)
 
-ch0fix = bs4.BeautifulSoup('<html><link href="stylesheet.css" type="text/css" rel="stylesheet"/><head><meta http-equiv="Content-Type" content="application/xhtml+xml; charset=utf-8" /></head><body><h2>'+ storytitle +'</h2><h3> Details about the story.</h3><p>Created by: '+ authorname +'</p><p>Last Chapter Upload: '+ latestchpupload +'</p><p></p><p>Genre: '+ genre +'</p><p></p><p>Tags: '+ tags +'</p><p></p><p>Ebook made using SHepub.</p><p></p><p>Synopsis: '+ synopsisbook +'</p></body></html>', features="lxml")
+ch0fix = bs4.BeautifulSoup('<html><link href="stylesheet.css" type="text/css" rel="stylesheet"/><head><meta http-equiv="Content-Type" content="application/xhtml+xml; charset=utf-8" /></head><body><h2>'+ storytitle +'</h2><h3> Details about the story.</h3><p>Created by: '+ authorname +'</p><p>Last Chapter Upload: '+ latestchpupload +'</p><p></p><p>Genre: '+ genre +'</p><p></p><p>Tags: '+ tags +'</p><p></p><p>Scrapped at: '+ starttimetime +'</p><p>Ebook made using SHepub.</p><p></p><p>Synopsis: '+ synopsisbook +'</p></body></html>', features="lxml")
 
 ch0 = epub.EpubHtml(title='Details',
                    file_name='OEBPS/details.xhtml',
@@ -225,6 +227,13 @@ def chpdata(URL,passes):
   if nextchpurl == None:
     chppathnum = 1
     chpcontent = []
+    gettime()
+    endtimetime = gettime.timestr
+    endtime = str("End Time of Scraping: " + endtimetime)
+    logging.debug(endtime)
+    print("Passes: ", passes)
+    chpcontentlen = len(chpcontentraw)
+    print("This should be the same number as passes. \n chpcontentraw.len() = ", chpcontentlen)
 
     for i in range(len(chpcontentraw)):
         chppath = 'OEBPS/ch%s.xhtml' % str(chppathnum)
@@ -245,18 +254,11 @@ def chpdata(URL,passes):
     logging.debug(chpcontent)
 
     book.add_item(nav_css)
-    #book.add_item(epub.EpubNcx())
-    book.add_item(epub.EpubNav())
-
-    epub.write_epub('%s.epub' % storytitle, book, {})
-
-    logging.debug(chpcontentraw)
-    print("Passes: ", passes)
-    chpcontentlen = len(chpcontentraw)
-    print("This should be the same number as passes. \n chpcontentraw.len() = ", chpcontentlen)
-    gettime()
-    endtime = "End Time of Scraping: %s" %(gettime.timestr)
-    logging.debug(endtime)
+    book.add_item(epub.EpubNcx())
+    #book.add_item(epub.EpubNav()) #this doesnt work for whatever reason
+    endtimetitle = endtimetime.replace(":","-")
+    epubtitle = '{0} (Scrapped at {1}).epub'.format(storytitle, endtimetitle)
+    epub.write_epub(epubtitle, book, {})
     exit()
   else:
     nextchpurl = nextchpurl['href']
