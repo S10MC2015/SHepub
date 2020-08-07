@@ -6,6 +6,7 @@
 #Thanks to fanficfare for inadvertantly teaching me what decompose does and i really wish i knew you existed before i started this lol.
 #Also thank you to fanficfare as i used your stylesheet without permission please forgive me.
 #https://stackoverflow.com/a/35156699 for venv.sh thing
+#Also thanks to https://towardsdatascience.com/how-to-download-an-image-using-python-38a75cfa21c for telling me how to download the cover image. 
 #Also Thanks to Ghost and Ultra for the help.
 
 #Import all the things that will be needed
@@ -14,7 +15,7 @@ import os
 import bs4
 import ebooklib
 from ebooklib import epub
-from zipfile import ZipFile
+import shutil
 import datetime
 import logging
 
@@ -68,10 +69,6 @@ authorname = sphtml.find(class_='auth_name_fic')
 authorname = authorname.get_text()
 print("Author: " + authorname + "\n \n")
 
-#Finds the element for coverimage then takes the image source url out of it.
-coverimage = sphtml.find(class_='fic_image')
-coverimage = coverimage.find('img')['src']
-print("CoverImage URL: " + coverimage + "\n \n")
 
 latestchpupload = sphtml.find(class_='fic_date_pub')
 latestchpupload = latestchpupload['title']
@@ -130,6 +127,19 @@ if firstchpurl == None:
 else:
   print("First Chapter URL: " + firstchpurl + "\n \n")
 
+#Finds the element for coverimage then takes the image source url out of it.
+coverimageurl = sphtml.find(class_='fic_image')
+coverimageurl = coverimageurl.find('img')['src']
+print("CoverImage URL: " + coverimageurl + "\n \n")
+
+imagerequest = requests.get(coverimageurl, stream = True)
+imagerequest.raw.decode_content = True
+with open("cover.jpg",'wb') as f:
+        shutil.copyfileobj(imagerequest.raw, f)
+print("Cover Image Sucessfully Downloaded")
+
+book.set_cover("cover.jpg",open('cover.jpg', 'rb').read(), create_page=True)
+
 #create book uid but i am an idiot.
 bookid = URL
 bookid = bookid.replace("https://","")
@@ -149,7 +159,7 @@ book.add_metadata('DC', 'description', synopsis)
 
 synopsisbook = str(synopsisraw)
 
-ch0fix = bs4.BeautifulSoup('<html><link href="stylesheet.css" type="text/css" rel="stylesheet"/><head><meta http-equiv="Content-Type" content="application/xhtml+xml; charset=utf-8" /></head><body><h2>'+ storytitle +'</h2><h3> Details about the story.</h3><p>Created by: '+ authorname +'</p><p>Last Chapter Upload: '+ latestchpupload +'</p><p></p><p>Genre: '+ genre +'</p><p></p><p>Tags: '+ tags +'</p><p></p><p>Scrapped at: '+ starttimetime +'</p><p>Ebook made using SHepub.</p><p></p><p>Synopsis: '+ synopsisbook +'</p></body></html>', features="lxml")
+ch0fix = bs4.BeautifulSoup('<html><meta http-equiv="Content-Type" content="application/xhtml+xml; charset=utf-8" /><body><h2>'+ storytitle +'</h2><h3> Details about the story.</h3><p><img src="cover.jpg"/></p><p>Created by: '+ authorname +'</p><p>Last Chapter Upload: '+ latestchpupload +'</p><p></p><p>Genre: '+ genre +'</p><p></p><p>Tags: '+ tags +'</p><p></p><p>Scrapped at: '+ starttimetime +'</p><p>Ebook made using SHepub.</p><p></p><p>Synopsis: '+ synopsisbook +'</p></body></html>', features="lxml")
 
 ch0 = epub.EpubHtml(title='Details',
                    file_name='OEBPS/details.xhtml',
@@ -175,7 +185,7 @@ ch0.add_item(nav_css)
 book.add_item(ch0)
 
 book.toc = [ch0]
-book.spine = [ch0]
+book.spine = ['cover',ch0]
 
 URL = firstchpurl
 
@@ -213,9 +223,9 @@ def chpdata(URL,passes):
     chpcontentsingle = ("%s Author Notes: %s" % (chpraw, anraw))
 
   chpcontentsingle = chpcontentsingle.replace("\n","")
-  chpcontentsingle = chpcontentsingle.replace("\'","")
+  #chpcontentsingle = chpcontentsingle.replace("\'","")
   chptitle = chptitle.replace("\n","")
-  chptitle = chptitle.replace("\'","")
+  #chptitle = chptitle.replace("\'","")
 
   chpcontentsinglefix = bs4.BeautifulSoup('<html><link href="stylesheet.css" type="text/css" rel="stylesheet"/><meta http-equiv="Content-Type" content="application/xhtml+xml; charset=utf-8" /><body><h2>'+ chptitle +'</h2><p></p>'+ chpcontentsingle +'</body></html>', features="lxml")
   
@@ -241,8 +251,8 @@ def chpdata(URL,passes):
 
         chpcontentraw[i] = chpcontentraw[i].prettify()
         chpcontentraw[i] = chpcontentraw[i].replace("\n","")
-        chpcontentraw[i] = chpcontentraw[i].replace("  ","")
-        chpcontentraw[i] = chpcontentraw[i].replace("> <","><")
+        #chpcontentraw[i] = chpcontentraw[i].replace("  ","")
+        #chpcontentraw[i] = chpcontentraw[i].replace("> <","><")
 
         chpcontent[i].content = chpcontentraw[i]
         chpcontent[i].add_item(nav_css)
@@ -259,6 +269,7 @@ def chpdata(URL,passes):
     endtimetitle = endtimetime.replace(":","-")
     epubtitle = '{0} (Scrapped at {1}).epub'.format(storytitle, endtimetitle)
     epub.write_epub(epubtitle, book, {})
+    os.remove("cover.jpg")
     exit()
   else:
     nextchpurl = nextchpurl['href']
