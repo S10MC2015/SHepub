@@ -6,7 +6,7 @@ html5lib==1.1
 joblib==0.15.1
 jsonschema==3.2.0
 lockfile==0.12.2
-lxml==4.5.2
+lxml==4.6.2
 m2r==0.2.1
 MarkupSafe==1.1.1
 numpy==1.19.0
