@@ -3,7 +3,7 @@ bpython==0.19
 bs4==0.0.1
 EbookLib==0.17.1
 html5lib==1.1
-joblib==0.15.1
+joblib==1.2.0
 jsonschema==3.2.0
 lockfile==0.12.2
 lxml==4.6.3
